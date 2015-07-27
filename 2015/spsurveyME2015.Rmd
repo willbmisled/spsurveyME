@@ -1,10 +1,28 @@
-spsurveyMaine: select 30 Kennebec county lakes > 150 acres with an unstratified equal probability design
-========================================================
-# Initial Setup
+---
+title: "spsurveyME2015"
+author: "Bryan Milstead"
+date: "Monday, July 27, 2015"
+output: pdf_document
+---
+<!---
+use these command instead of the knit icon if you want the data and work loaded into the R workspace
+  library(knitr)
+    setwd("2015")
+    knit('spsurveyME2015.rmd')
+-->
 
-load the packages needed for the analysis.
+##Introduction
 
-```{r setup, include=FALSE, echo=TRUE, cache=FALSE}
+* Linda Bacon has asked for a selection of 30 ME lakes for Cyanobacteria monitoring during the summer of 2015 with an unstratified equal probability design.
+* The sampling frame is a shapefile (Lakesover150A.shp) from Linda with a set of 45 lakes > 150 acres in Androscoggin, Knox, Lincoln and Sagadahoc counties (Maine)
+* The R package spsurvey will be used to select the lakes following the 1st example in <http://cran.r-project.org/web/packages/spsurvey/vignettes/Finite_Design.pdf> by Thomas Kincaid.
+* This same approach was used last year.  See: <https://github.com/willbmisled/2014/spsurveyME2014.md>
+* The final document for the 2015 draw is available here: <https://github.com/willbmisled/2015/spsurveyME2015.pdf>
+* The complete document with code chunks is here: <https://github.com/willbmisled/2015/spsurveyME2015.rmd>
+
+##Workflow
+
+```{r setup, include=FALSE, echo=FALSE, cache=FALSE}
  #install (if needed) and load R packages
     libs<-c("spsurvey","sp","maptools","rgdal") #list of packages to load
     installLoad<-function(pck){   #user defined function
@@ -12,38 +30,33 @@ load the packages needed for the analysis.
         require(pck, character.only = TRUE)
     }
   lapply(libs,function(x) installLoad(x))  #Load/Install require packages
+
 ```
 
-# Introduction
+* load r packages:  `r libs`
+* read the sample frame (Lakesover150A.shp)
+* reproject data from NAD_1983_UTM_Zone_19N to Albers
+* Convert from spatialPolygonsDataFrame to a spatialPointsDataFrame based on centroids
 
-Sample design document for Kennebec county lakes > 150 acres.  Linda Bacon provided a shapefile with the lakes and asked for an unstratified equal probability design that includes 30 lakes.  We follow the 1st example in [Finite_Design.pdf](http://cran.r-project.org/web/packages/spsurvey/vignettes/Finite_Design.pdf) by Thomas Kincaid to use the R package spsurvey to conduct a GRTS survey designs for a finite resource. All data and code for this project are available on [github](https://github.com/willbmisled/spsurveyME).
-
-# Data
-
-The sample frame was provided by Linda Bacon as a shapefile with 39 lakes greater than 150 acres in Kennebec County.  The shapefile is in NAD_1983_UTM_Zone_19N.  The first step is reproject to albers equal area. Then the spatialPolygonsDataFrame must be converted to a spatialPointsDataFrame.
-
-```{r projection,echo=TRUE,include=FALSE,cache=TRUE}
+```{r projection,echo=TRUE,include=FALSE,cache=FALSE}
   #Input CRS: ESRI NAD_1983_UTM_Zone_19N is EPSG:26919
     NAD83_19N<-CRS('+proj=utm +zone=19 +datum=NAD83 +units=m +no_defs')
   #Output CRS: ESRI North_America_Albers_Equal_Area_Conic
     Albers<-CRS('+proj=aea +x_0=0 +y_0=0 +lon_0=-96 +lat_1=20 +lat_2=60 +lat_0=40 +units=m +datum=NAD83')
   #Read Original Shapefile
-    lakesUTM<-readShapePoly('150AcKennebecLakes.shp',proj4string=NAD83_19N)
+    lakesUTM<-readShapePoly('Lakesover150A.shp',proj4string=NAD83_19N)
   #Reproject to Albers
     lakesAlb<-spTransform(lakesUTM,Albers)
   #Convert from spatialPolygonsDataFrame to a spatialPointsDataFrame based on centroids
     lakesAlbPts<-SpatialPointsDataFrame(coordinates(lakesAlb),slot(lakesAlb,"data"), proj4string=Albers)
 ```
 
-# spsurvey GRTS unstratified, equal probability design 
+* draw 30 lakes from sample frame with the spsurvey GRTS unstratified, equal probability design 
 
-The finite resource used in the designs is lakes>150acres in Kennebec county Maine.  We use the R package "spsurvey" to develop unstratified, equal probability design for up to 30 lakes. The set.seed function is called so that, if necessary, the designs can be replicated.
-
-
-```{r SPsurvey,echo=TRUE,include=TRUE,cache=TRUE}
+  ```{r SPsurvey,echo=FALSE,include=FALSE,cache=FALSE}
   # Read the attribute table from the shapefile
-    att <- read.dbf("lakesAlb") 
-  # Call the set.seed function so that the survey designs can be replicate
+    att <- read.dbf("Lakesover150A.dbf") 
+  # Call the set.seed function so that the survey designs can be replicated
     set.seed(108)
   # Create the design list
     Equaldsgn <- list(None=list(panel=c(PanelOne=30), seltype="Equal")) #PanelOne=30 is the sample size
@@ -57,14 +70,12 @@ The finite resource used in the designs is lakes>150acres in Kennebec county Mai
 # Results
 
 Below is a list of the selected sites.  The siteIDs are assigned by SPsurvey.  The idea is that you select the sites in order of the siteIDs.  If a site cannot be visited for any reason choose the next site from the list.  There is also a rough figure showing all of the lakes as polygons and the selected lakes as the blue centroids.
-```{r printResults,echo=TRUE,include=TRUE,cache=TRUE}
 
-  # Print the initial six lines of the survey design
-    Equalsites@data[,c('siteID','GNIS_ID','GNIS_Name','AreaSqKm','ReachCode','acres')]
+```{r printResults,echo=FALSE,include=TRUE,cache=FALSE}
+    Equalsites@data[,c("siteID","LAKENAME","MIDAS_NUM" )]
   #create "map" of results
     lakesSelect<-readShapePoints('sample.shp',proj4string=Albers) #read the shapefile of selected lake (points)
     plot(lakesAlb)
     plot(lakesSelect,add=T,pch=19,col='blue')
 ```
-
 
