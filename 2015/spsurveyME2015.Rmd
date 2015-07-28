@@ -10,6 +10,9 @@ use these command instead of the knit icon if you want the data and work loaded 
     setwd("2015")
     knit('spsurveyME2015.rmd')
 -->
+##to do
+* fix links
+* convert 2014 document to PDF
 
 ##Introduction
 

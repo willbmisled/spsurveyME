@@ -1,10 +1,23 @@
+---
+title: "spsurveyME2014"
+author: "Bryan Milstead"
+date: "Monday, July 27, 2015"
+output: pdf_document
+---
+<!---
+use these command instead of the knit icon if you want the data and work loaded into the R workspace
+  library(knitr)
+    setwd("2015")
+    knit('spsurveyME2015.rmd')
+-->
+
 spsurveyMaine: select 30 Kennebec county lakes > 150 acres with an unstratified equal probability design
 ========================================================
 # Initial Setup
 
 load the packages needed for the analysis.
 
-```{r setup, include=FALSE, echo=TRUE, cache=FALSE}
+```{r setup, include=FALSE, echo=FALSE, cache=FALSE}
  #install (if needed) and load R packages
     libs<-c("spsurvey","sp","maptools","rgdal") #list of packages to load
     installLoad<-function(pck){   #user defined function
@@ -23,7 +36,7 @@ Sample design document for Kennebec county lakes > 150 acres.  Linda Bacon provi
 
 The sample frame was provided by Linda Bacon as a shapefile with 39 lakes greater than 150 acres in Kennebec County.  The shapefile is in NAD_1983_UTM_Zone_19N.  The first step is reproject to albers equal area. Then the spatialPolygonsDataFrame must be converted to a spatialPointsDataFrame.
 
-```{r projection,echo=TRUE,include=FALSE,cache=TRUE}
+```{r projection,echo=FALSE,include=FALSE,cache=FALSE}
   #Input CRS: ESRI NAD_1983_UTM_Zone_19N is EPSG:26919
     NAD83_19N<-CRS('+proj=utm +zone=19 +datum=NAD83 +units=m +no_defs')
   #Output CRS: ESRI North_America_Albers_Equal_Area_Conic
@@ -41,7 +54,7 @@ The sample frame was provided by Linda Bacon as a shapefile with 39 lakes greate
 The finite resource used in the designs is lakes>150acres in Kennebec county Maine.  We use the R package "spsurvey" to develop unstratified, equal probability design for up to 30 lakes. The set.seed function is called so that, if necessary, the designs can be replicated.
 
 
-```{r SPsurvey,echo=TRUE,include=TRUE,cache=TRUE}
+```{r SPsurvey,echo=FALSE,include=FALSE,cache=FALSE}
   # Read the attribute table from the shapefile
     att <- read.dbf("lakesAlb") 
   # Call the set.seed function so that the survey designs can be replicate
@@ -58,10 +71,10 @@ The finite resource used in the designs is lakes>150acres in Kennebec county Mai
 # Results
 
 Below is a list of the selected sites.  The siteIDs are assigned by SPsurvey.  The idea is that you select the sites in order of the siteIDs.  If a site cannot be visited for any reason choose the next site from the list.  There is also a rough figure showing all of the lakes as polygons and the selected lakes as the blue centroids.
-```{r printResults,echo=TRUE,include=TRUE,cache=TRUE}
+```{r printResults,echo=FALSE,include=TRUE,cache=FALSE}
 
   # Print the initial six lines of the survey design
-    Equalsites@data[,c('siteID','GNIS_ID','GNIS_Name','AreaSqKm','ReachCode','acres')]
+    Equalsites@data[,c('siteID','GNIS_ID','GNIS_Name','AreaSqKm','acres')]
   #create "map" of results
     lakesSelect<-readShapePoints('sample.shp',proj4string=Albers) #read the shapefile of selected lake (points)
     plot(lakesAlb)
