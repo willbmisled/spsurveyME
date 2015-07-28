@@ -10,18 +10,15 @@ use these command instead of the knit icon if you want the data and work loaded 
     setwd("2015")
     knit('spsurveyME2015.rmd')
 -->
-##to do
-* fix links
-* convert 2014 document to PDF
-
 ##Introduction
 
 * Linda Bacon has asked for a selection of 30 ME lakes for Cyanobacteria monitoring during the summer of 2015 with an unstratified equal probability design.
 * The sampling frame is a shapefile (Lakesover150A.shp) from Linda with a set of 45 lakes > 150 acres in Androscoggin, Knox, Lincoln and Sagadahoc counties (Maine)
-* The R package spsurvey will be used to select the lakes following the 1st example in <http://cran.r-project.org/web/packages/spsurvey/vignettes/Finite_Design.pdf> by Thomas Kincaid.
-* This same approach was used last year.  See: <https://github.com/willbmisled/2014/spsurveyME2014.md>
-* The final document for the 2015 draw is available here: <https://github.com/willbmisled/2015/spsurveyME2015.pdf>
-* The complete document with code chunks is here: <https://github.com/willbmisled/2015/spsurveyME2015.rmd>
+* The R package `spsurvey` will be used to select the lakes following the 1st example in <http://cran.r-project.org/web/packages/spsurvey/vignettes/Finite_Design.pdf> by Thomas Kincaid.
+* This same approach was used last year.  See: <https://github.com/willbmisled/spsurveyME/raw/master/2014/spsurveyME2014.pdf>
+* This document for the 2015 draw is available here: <https://github.com/willbmisled/spsurveyME/raw/master/2015/spsurveyME2015.pdf>
+* The r code to repeat this procedure is available as an r markdown document: <https://github.com/willbmisled/spsurveyME/blob/master/2015/spsurveyME2015.Rmd>
+* If you are Rstudio/github savvy you can also fork the repostory (<https://github.com/willbmisled/spsurveyME>) and have access to all code, data, and products.
 
 ##Workflow
 
@@ -72,13 +69,19 @@ use these command instead of the knit icon if you want the data and work loaded 
 
 # Results
 
-Below is a list of the selected sites.  The siteIDs are assigned by SPsurvey.  The idea is that you select the sites in order of the siteIDs.  If a site cannot be visited for any reason choose the next site from the list.  There is also a rough figure showing all of the lakes as polygons and the selected lakes as the blue centroids.
+* Below is a list of the selected sites.  The siteIDs are assigned by `spsurvey`.  The idea is that you select the sites in order of the siteIDs.  If a site cannot be visited for any reason choose the next site from the list.  There is also a rough figure showing all of the lakes as polygons and the selected lakes as the blue centroids.
 
 ```{r printResults,echo=FALSE,include=TRUE,cache=FALSE}
     Equalsites@data[,c("siteID","LAKENAME","MIDAS_NUM" )]
+```
+
+* Here is a rough figure showing all of the lakes as polygons and the selected lakes as the blue centroids.
+
+```{r plotResults,echo=FALSE,include=TRUE,cache=FALSE}
   #create "map" of results
     lakesSelect<-readShapePoints('sample.shp',proj4string=Albers) #read the shapefile of selected lake (points)
     plot(lakesAlb)
     plot(lakesSelect,add=T,pch=19,col='blue')
+    box()
 ```
 
